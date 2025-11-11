@@ -1,21 +1,68 @@
-import React, { use, useEffect, useState } from 'react';
-import { AuthContext } from '../../Contexts/AuthContext';
-import Swal from 'sweetalert2';
+import React, { use, useEffect, useState } from 'react'
+import { AuthContext } from '../../Contexts/AuthContext'
+import Swal from 'sweetalert2'
+import useAxiosSecure from '../../Hooks/useAxiosSecure'
 
 const MyBids = () => {
-  const { user } = use(AuthContext);
-  const [bids, setBids] = useState([]);
+  const { user } = use(AuthContext)
+  const [bids, setBids] = useState([])
+  const axiosSecure = useAxiosSecure()
+
+  //   console.log('token', user.accessToken);
 
   useEffect(() => {
-    if (user?.email) {
-      fetch(`http://localhost:3000/bids/?email=${user.email}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          setBids(data);
-        });
-    }
-  }, [user?.email]);
+    axiosSecure.get(`/bids/?email=${user.email}`).then((data) => {
+      setBids(data.data)
+    })
+  }, [user, axiosSecure])
+
+  //   useEffect(() => {
+  //     if (user?.email) {
+  //       fetch(`https://smart-deals-server-ochre.vercel.app/bids/?email=${user.email}`, {
+  //         headers: {
+  //           authorization: `Bearer ${user.accessToken}`,
+  //           //   authorization: `Bearer ${localStorage.getItem('token')}`,
+  //         },
+  //       })
+  //         .then((res) => res.json())
+  //         .then((data) => {
+  //           console.log(data);
+  //           setBids(data);
+  //         });
+  //     }
+  //   }, [user]);
+
+  //   useEffect(() => {
+  //     if (user?.email) {
+  //       fetch(`https://smart-deals-server-ochre.vercel.app/bids/?email=${user.email}`, {
+  //         headers: {
+  //           //   authorization: `Bearer ${user.accessToken}`,
+  //           authorization: `Bearer ${localStorage.getItem('token')}`,
+  //         },
+  //       })
+  //         .then((res) => res.json())
+  //         .then((data) => {
+  //           console.log(data);
+  //           setBids(data);
+  //         });
+  //     }
+  //   }, [user]);
+
+  //   useEffect(() => {
+  //     if (user?.email) {
+  //       fetch(`https://smart-deals-server-ochre.vercel.app/bids/?email=${user.email}`, {
+  //         headers: {
+  //           authorization: `Bearer ${user.accessToken}`,
+  //           //   authorization: `Bearer ${}`,
+  //         },
+  //       })
+  //         .then((res) => res.json())
+  //         .then((data) => {
+  //           console.log(data);
+  //           setBids(data);
+  //         });
+  //     }
+  //   }, [user]);
 
   const handleDeleteBid = (_id) => {
     Swal.fire({
@@ -28,7 +75,7 @@ const MyBids = () => {
       confirmButtonText: 'Yes, delete it!',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:3000/bids/${_id}`, {
+        fetch(`https://smart-deals-server-ochre.vercel.app/bids/${_id}`, {
           method: 'DELETE',
         })
           .then((res) => res.json())
@@ -39,16 +86,16 @@ const MyBids = () => {
                 title: 'Deleted!',
                 text: 'Your bid has been deleted.',
                 icon: 'success',
-              });
+              })
 
               //
-              const remainingBids = bids.filter((bid) => bid._id !== _id);
-              setBids(remainingBids);
+              const remainingBids = bids.filter((bid) => bid._id !== _id)
+              setBids(remainingBids)
             }
-          });
+          })
       }
-    });
-  };
+    })
+  }
 
   return (
     <div>
@@ -110,7 +157,7 @@ const MyBids = () => {
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MyBids;
+export default MyBids

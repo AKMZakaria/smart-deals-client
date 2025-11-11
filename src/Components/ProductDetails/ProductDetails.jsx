@@ -1,34 +1,49 @@
-import { use, useEffect, useRef, useState } from 'react';
-import { useLoaderData } from 'react-router';
-import { AuthContext } from '../../Contexts/AuthContext';
-import Swal from 'sweetalert2';
+import { use, useEffect, useRef, useState } from 'react'
+import { useLoaderData } from 'react-router'
+import { AuthContext } from '../../Contexts/AuthContext'
+import Swal from 'sweetalert2'
+import axios from 'axios'
 
 const ProductDetails = () => {
-  const { _id: productId } = useLoaderData();
-  const [bids, setBids] = useState([]);
-  const bidModalRef = useRef(null);
+  const { _id: productId } = useLoaderData()
+  const [bids, setBids] = useState([])
+  const bidModalRef = useRef(null)
 
-  const { user } = use(AuthContext);
+  const { user } = use(AuthContext)
 
+  // using axios
   useEffect(() => {
-    fetch(`http://localhost:3000/products/bids/${productId}`)
-      .then((res) => res.json())
+    axios
+      .get(`https://smart-deals-server-ochre.vercel.app/products/bids/${productId}`)
       .then((data) => {
-        console.log(data);
-        setBids(data);
-      });
-  }, [productId]);
+        console.log('after axios get', data)
+        setBids(data.data)
+      })
+  }, [productId])
+
+  //   useEffect(() => {
+  //     fetch(`https://smart-deals-server-ochre.vercel.app/products/bids/${productId}`, {
+  //       headers: {
+  //         authorization: `Bearer ${user.accessToken}`,
+  //       },
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         console.log(data);
+  //         setBids(data);
+  //       });
+  //   }, [productId, user]);
 
   const handleBidModalOpen = () => {
-    bidModalRef.current.showModal();
-  };
+    bidModalRef.current.showModal()
+  }
 
   const handleBidSubmit = (e) => {
-    e.preventDefault();
-    const name = e.target.name.value;
-    const email = e.target.email.value;
-    const bid = e.target.bid.value;
-    console.log(productId, name, email, bid);
+    e.preventDefault()
+    const name = e.target.name.value
+    const email = e.target.email.value
+    const bid = e.target.bid.value
+    console.log(productId, name, email, bid)
 
     const newBid = {
       product: productId,
@@ -37,9 +52,9 @@ const ProductDetails = () => {
       buyer_image: user?.photoURL,
       bid_price: bid,
       status: 'pending',
-    };
+    }
 
-    fetch('http://localhost:3000/bids', {
+    fetch('https://smart-deals-server-ochre.vercel.app/bids', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -49,22 +64,22 @@ const ProductDetails = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.insertedId) {
-          bidModalRef.current.close();
+          bidModalRef.current.close()
           Swal.fire({
             position: 'top-end',
             icon: 'success',
             title: 'Your bid has been placed',
             showConfirmButton: false,
             timer: 1500,
-          });
+          })
 
           //    add the new bid to the state
-          newBid._id = data.insertedId;
-          const newBids = [...bids, newBid].sort((a, b) => b.bid_price - a.bid_price);
-          setBids(newBids);
+          newBid._id = data.insertedId
+          const newBids = [...bids, newBid].sort((a, b) => b.bid_price - a.bid_price)
+          setBids(newBids)
         }
-      });
-  };
+      })
+  }
 
   return (
     <div>
@@ -135,7 +150,7 @@ const ProductDetails = () => {
             <tbody>
               {/* row 1 */}
               {bids.map((bid, index) => (
-                <tr>
+                <tr key={bid._id}>
                   <th>{index + 1}</th>
                   <td>
                     <div className="flex items-center gap-3">
@@ -164,7 +179,7 @@ const ProductDetails = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProductDetails;
+export default ProductDetails

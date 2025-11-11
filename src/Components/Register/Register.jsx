@@ -1,22 +1,22 @@
-import React, { use } from 'react';
-import { AuthContext } from '../../Contexts/AuthContext';
+import React, { use } from 'react'
+import { AuthContext } from '../../Contexts/AuthContext'
 
 const Register = () => {
-  const { signInGoogle } = use(AuthContext);
+  const { signInGoogle } = use(AuthContext)
 
   const handleGoogleSignIn = () => {
     signInGoogle()
       .then((res) => {
-        console.log(res.user);
+        console.log(res.user)
 
         const newUser = {
           name: res.user.displayName,
           email: res.user.email,
           image: res.user.photoURL,
-        };
+        }
 
         // create user in the database
-        fetch('http://localhost:3000/users', {
+        fetch('https://smart-deals-server-ochre.vercel.app/users', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -25,13 +25,13 @@ const Register = () => {
         })
           .then((res) => res.json())
           .then((data) => {
-            console.log('data after user save', data);
-          });
+            console.log('data after user save', data)
+          })
       })
       .catch((err) => {
-        console.log(err);
-      });
-  };
+        console.log(err)
+      })
+  }
 
   return (
     <div className="flex items-center justify-center h-[80vh]">
@@ -76,7 +76,7 @@ const Register = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register

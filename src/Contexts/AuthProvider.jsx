@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { AuthContext } from './AuthContext';
+import React, { useEffect, useState } from 'react'
+import { AuthContext } from './AuthContext'
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -7,44 +7,63 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-} from 'firebase/auth';
-import { auth } from '../Firebase/firebase.config';
+} from 'firebase/auth'
+import { auth } from '../Firebase/firebase.config'
 
-const googleProvider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider()
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const createUser = (email, password) => {
-    setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password);
-  };
+    setLoading(true)
+    return createUserWithEmailAndPassword(auth, email, password)
+  }
 
   const logInUser = (email, password) => {
-    setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password);
-  };
+    setLoading(true)
+    return signInWithEmailAndPassword(auth, email, password)
+  }
 
   const signInGoogle = () => {
-    setLoading(true);
-    return signInWithPopup(auth, googleProvider);
-  };
+    setLoading(true)
+    return signInWithPopup(auth, googleProvider)
+  }
 
   const signOutUser = () => {
-    setLoading(true);
-    return signOut(auth);
-  };
+    setLoading(true)
+    return signOut(auth)
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
+      setUser(currentUser)
+
+      if (currentUser) {
+        const loggedUser = { email: currentUser.email }
+        fetch('https://smart-deals-server-ochre.vercel.app/getToken', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(loggedUser),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log('after getting token', data.token)
+            localStorage.setItem('token', data.token)
+          })
+      } else {
+        localStorage.removeItem('token')
+      }
+
+      setLoading(false)
+    })
     return () => {
-      unsubscribe();
-    };
-  }, []);
+      unsubscribe()
+    }
+  }, [])
 
   const authInfo = {
     createUser,
@@ -53,9 +72,9 @@ const AuthProvider = ({ children }) => {
     signOutUser,
     user,
     loading,
-  };
+  }
 
-  return <AuthContext value={authInfo}>{children}</AuthContext>;
-};
+  return <AuthContext value={authInfo}>{children}</AuthContext>
+}
 
-export default AuthProvider;
+export default AuthProvider

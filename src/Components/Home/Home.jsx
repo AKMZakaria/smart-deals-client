@@ -1,9 +1,9 @@
-import React from 'react';
-import LatestProducts from '../LatestProducts/LatestProducts';
+import React from 'react'
+import LatestProducts from '../LatestProducts/LatestProducts'
 
-const LatestProductsPromise = fetch('http://localhost:3000/latest-products').then((res) =>
-  res.json()
-);
+const LatestProductsPromise = fetch(
+  'https://smart-deals-server-ochre.vercel.app/latest-products'
+).then((res) => res.json())
 
 const Home = () => {
   return (
@@ -11,7 +11,7 @@ const Home = () => {
       <p>This is home</p>
       <LatestProducts LatestProductsPromise={LatestProductsPromise}></LatestProducts>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
